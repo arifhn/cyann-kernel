@@ -455,6 +455,8 @@ static inline int twl6030_mmc_card_detect(struct device *dev, int slot)
 
 #define TWL4030_PM_MASTER_GLOBAL_TST		0xb6
 
+#define TWL6030_PHOENIX_DEV_ON			0x06
+
 /*
  * PM Slave resource module register offsets (use TWL6030_MODULE_SLAVE_RES)
  */
@@ -681,10 +683,16 @@ struct twl4030_resconfig {
 	u8 remap_sleep;	/* sleep state remapping */
 };
 
+struct twl4030_system_config {
+	char *name;
+	u8 group;
+};
+
 struct twl4030_power_data {
 	struct twl4030_script **scripts;	/* used in TWL4030 only */
 	unsigned num;				/* used in TWL4030 only */
 	struct twl4030_resconfig *resource_config;
+	struct twl4030_system_config *sys_config; /*system resources*/
 #define TWL4030_RESCONFIG_UNDEF	((u8)-1)
 };
 
@@ -709,6 +717,8 @@ struct twl4030_codec_audio_data {
 	unsigned int check_defaults:1;
 	unsigned int reset_registers:1;
 	unsigned int hs_extmute:1;
+	unsigned int hs_switch_dev;
+	unsigned int hs_forced_hs_state;
 	u16 hs_left_step;
 	u16 hs_right_step;
 	u16 hf_left_step;
@@ -730,6 +740,9 @@ struct twl4030_codec_data {
 	int audpwron_gpio;	/* audio power-on gpio */
 	int naudint_irq;	/* audio interrupt */
 	unsigned int irq_base;
+	int (*get_ext_clk32k)(void);
+	void (*put_ext_clk32k)(void);
+	int (*set_ext_clk32k)(bool on);
 };
 
 struct twl4030_platform_data {
